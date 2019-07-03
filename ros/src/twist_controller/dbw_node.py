@@ -57,6 +57,11 @@ class DBWNode(object):
         # self.controller = Controller(<Arguments you wish to provide>)
 
         # TODO: Subscribe to all the topics you need to
+        self.current_vel = None
+        self.curr_ang_vel = None
+        self.dbw_enabled = None
+        self.linear_vel = None
+        self.throttle = self.steering = self.brake = 0
 
         self.loop()
 
@@ -72,6 +77,10 @@ class DBWNode(object):
             #                                                     <any other argument you need>)
             # if <dbw is enabled>:
             #   self.publish(throttle, brake, steer)
+            #if not None in (self.current_vel, self.liner_vel, self.angular_vel):
+#                self.throttle, self.brake, self.steering = self.controller.control(self.current_vel, self.dbw_enabled, self.linier_vel, self.angular_vel)
+#            if self.dbw_enabled:
+#                self.publish(self.throttle, self.brake, self.steering)                                                               
             rate.sleep()
 
     def publish(self, throttle, brake, steer):
