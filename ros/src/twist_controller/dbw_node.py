@@ -55,6 +55,16 @@ class DBWNode(object):
 
         # TODO: Create `Controller` object
         # self.controller = Controller(<Arguments you wish to provide>)
+        self.controller = Controller(vehicle_mass, 
+                                     fuel_capacity,
+                                     brake_deadband,
+                                     decel_limit,
+                                     accel_limit,
+                                     wheel_radius,
+                                     wheel_base,
+                                     steer_ratio,
+                                     max_lat_accel,
+                                     max_steer_angle)
 
         # TODO: Subscribe to all the topics you need to
         rospy.Subscriber('/vehicle/dbw_enabled', Bool, self.dbw_enabled_cb)
@@ -64,7 +74,7 @@ class DBWNode(object):
         self.current_vel = None
         self.curr_ang_vel = None
         self.dbw_enabled = None
-        self.linear_vel = None
+        self.linear_vel = 30
         self.angular_vel = None
         self.throttle = self.steering = self.brake = 0
 
@@ -82,22 +92,27 @@ class DBWNode(object):
             #                                                     <any other argument you need>)
             # if <dbw is enabled>:
             #   self.publish(throttle, brake, steer)
+            rospy.logwarn("Loooooop!!!!!")
+            rospy.logwarn("curr_vel:{0},lin_vel={1},ang_vel={2}".format(self.current_vel,self.linear_vel, self.angular_vel))
             if not None in (self.current_vel, self.linear_vel, self.angular_vel):
-                self.throttle, self.brake, self.steering = self.controller.control(self.current_vel, self.dbw_enabled, self.linear_vel, self.angular_vel)
+                self.throttle, self.brake, self.steering = self.controller.control(self.current_vel,
+                                                                                   self.dbw_enabled,
+                                                                                   self.linear_vel, 
+                                                                                   self.angular_vel)
             if self.dbw_enabled:
                 self.publish(self.throttle, self.brake, self.steering)                                                             
-            rospy.logwarn("self.current_vel:{0},th={1},br={2},str={3}".format(self.current_vel,self.throttle, self.brake, self.steering))
+                rospy.logwarn("self.current_vel:{0},th={1},br={2},str={3}".format(self.current_vel, self.throttle, self.brake, self.steering))
  
             rate.sleep()
 
     def dbw_enabled_cb(self, msg):
-        self.dbw_enable = msg
+        self.dbw_enabled = msg
         #rospy.logwarn("DBW Enabled:{0}".format(self.dbw_enabled))
  
 
     def twist_cb(self, msg):
         self.linear_vel = msg.twist.linear.x
-        self.aungular_vel = msg.twist.angular.z
+        self.angular_vel = msg.twist.angular.z
         #rospy.logwarn("twist.linear_vel:{0}".format(self.linear_vel))
 
     def velocity_cb(self, msg):
